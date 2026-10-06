@@ -1,0 +1,47 @@
+[
+  {
+    "id": "urban-relay",
+    "name": "Urban Relay",
+    "tag": "DAY / URBAN / DECOY",
+    "description": "A mixed-traffic urban corridor with one high-priority scout and a decoy signature.",
+    "duration": 90,
+    "defaultDegradation": 22,
+    "terrain": "urban",
+    "threats": [
+      {"id":"U-01","role":"scout","label":"Recon scout","x":0.18,"y":0.72,"vx":0.19,"vy":-0.04,"speed":0.8,"priority":"high","signature":"micro-UAS"},
+      {"id":"U-02","role":"decoy","label":"Decoy emitter","x":0.76,"y":0.25,"vx":-0.08,"vy":0.13,"speed":0.55,"priority":"medium","signature":"spoofed-track"},
+      {"id":"U-03","role":"cargo","label":"Cargo quad","x":0.52,"y":0.84,"vx":0.02,"vy":-0.16,"speed":0.45,"priority":"low","signature":"commercial-quad"}
+    ]
+  },
+  {
+    "id": "night-corridor",
+    "name": "Night Corridor",
+    "tag": "NIGHT / RURAL / LOW SIGNAL",
+    "description": "A low-light rural corridor with intermittent sensor confidence and a fast-moving unknown.",
+    "duration": 105,
+    "defaultDegradation": 48,
+    "terrain": "rural",
+    "threats": [
+      {"id":"N-01","role":"unknown","label":"Low-signature track","x":0.12,"y":0.28,"vx":0.21,"vy":0.11,"speed":0.9,"priority":"high","signature":"low-observable"},
+      {"id":"N-02","role":"scout","label":"Terrain-following scout","x":0.84,"y":0.76,"vx":-0.12,"vy":-0.14,"speed":0.7,"priority":"high","signature":"thermal-return"},
+      {"id":"N-03","role":"cargo","label":"Routine logistics","x":0.30,"y":0.90,"vx":0.08,"vy":-0.06,"speed":0.35,"priority":"low","signature":"commercial-quad"}
+    ]
+  },
+  {
+    "id": "swarm-breakout",
+    "name": "Swarm Breakout",
+    "tag": "DAY / PERIMETER / SWARM",
+    "description": "A six-track swarm exercise designed to test triage, prioritisation and repeated response decisions.",
+    "duration": 120,
+    "defaultDegradation": 34,
+    "terrain": "perimeter",
+    "threats": [
+      {"id":"S-01","role":"scout","label":"Lead scout","x":0.10,"y":0.48,"vx":0.20,"vy":-0.02,"speed":0.9,"priority":"high","signature":"micro-UAS"},
+      {"id":"S-02","role":"scout","label":"Wing scout A","x":0.12,"y":0.32,"vx":0.18,"vy":0.06,"speed":0.75,"priority":"high","signature":"micro-UAS"},
+      {"id":"S-03","role":"scout","label":"Wing scout B","x":0.12,"y":0.65,"vx":0.18,"vy":-0.05,"speed":0.78,"priority":"high","signature":"micro-UAS"},
+      {"id":"S-04","role":"decoy","label":"Signature decoy","x":0.38,"y":0.15,"vx":0.06,"vy":0.16,"speed":0.5,"priority":"medium","signature":"spoofed-track"},
+      {"id":"S-05","role":"cargo","label":"Civilian overflight","x":0.78,"y":0.82,"vx":-0.14,"vy":-0.08,"speed":0.4,"priority":"low","signature":"commercial-quad"},
+      {"id":"S-06","role":"unknown","label":"Late entrant","x":0.92,"y":0.20,"vx":-0.17,"vy":0.10,"speed":0.68,"priority":"high","signature":"low-observable"}
+    ]
+  }
+]
