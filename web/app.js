@@ -11,8 +11,9 @@ const state = {
   difficulty: 2,
   degradation: 0,
   rng: () => 0.5,
+  aiRequest: 0,
   log: [],
-  metrics: { score: 0, detected: 0, classified: 0, correct: 0, alerts: 0, resolved: 0, falseActions: 0, reaction: [] }
+  metrics: { score: 0, detected: 0, classified: 0, correct: 0, alerts: 0, resolved: 0, falseActions: 0, reaction: [], aiAccepted: 0, aiOverrides: 0 }
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -65,7 +66,7 @@ function selectScenario(scenario) {
   renderScenarioCards();
 }
 
-function resetMetrics() { state.metrics = { score: 0, detected: 0, classified: 0, correct: 0, alerts: 0, resolved: 0, falseActions: 0, reaction: [] }; }
+function resetMetrics() { state.metrics = { score: 0, detected: 0, classified: 0, correct: 0, alerts: 0, resolved: 0, falseActions: 0, reaction: [], aiAccepted: 0, aiOverrides: 0 }; }
 
 function resetSession() {
   state.running = false;
@@ -73,6 +74,7 @@ function resetSession() {
   state.elapsed = 0;
   state.lastFrame = 0;
   state.selected = null;
+  state.aiRequest += 1;
   state.log = [];
   resetMetrics();
   state.rng = makeRng(`${state.scenario?.id || 'offline'}:${state.difficulty}`);
@@ -85,6 +87,8 @@ function resetSession() {
   $('#startBtn').textContent = 'Start exercise ↗';
   $('#feedValue').textContent = 'STAGED';
   $('#feedNote').textContent = 'Select a radar track to act';
+  $('#aiCue').textContent = 'MODEL IDLE';
+  $('#aiEvidence').textContent = 'Select a track to request an explainable role cue · human remains in control';
   $('#selectedTrack').textContent = 'None';
   $('#crosshair').hidden = true;
   renderAll();
@@ -271,7 +275,40 @@ function selectTrack(id) {
   $('#selectedTrack').textContent = `${threat.id} · ${threat.label}`;
   $('#feedNote').textContent = `${threat.signature} · ${threat.priority} priority`;
   if (threat.status === 'unseen') logEvent('SENSOR', `${threat.id} selected from ${state.degradation ? 'degraded' : 'clean'} feed.`);
+  requestAICue(threat);
   renderAll(); drawArena();
+}
+
+function modelLabel(label) { return label === 'cargo' ? 'CARGO / CIVILIAN' : label.toUpperCase(); }
+
+async function requestAICue(threat) {
+  const requestId = ++state.aiRequest;
+  $('#aiCue').textContent = 'RUNNING…';
+  $('#aiEvidence').textContent = 'aeris-softmax-v1 · extracting local telemetry features';
+  try {
+    const response = await fetch('/api/ai/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        threat,
+        context: {
+          night: state.scenario?.id === 'night-corridor',
+          swarm: state.scenario?.id === 'swarm-breakout'
+        }
+      })
+    });
+    if (!response.ok) throw new Error('AI service unavailable');
+    const prediction = await response.json();
+    if (requestId !== state.aiRequest) return;
+    threat.aiPrediction = prediction.label;
+    threat.aiConfidence = prediction.confidence;
+    $('#aiCue').textContent = `${modelLabel(prediction.label)} · ${Math.round(prediction.confidence * 100)}%`;
+    $('#aiEvidence').textContent = `${prediction.model} · ${prediction.evidence.join(' · ')}`;
+  } catch (error) {
+    if (requestId !== state.aiRequest) return;
+    $('#aiCue').textContent = 'UNAVAILABLE';
+    $('#aiEvidence').textContent = 'Start server.py to enable the local trained model';
+  }
 }
 
 function performAction(action) {
@@ -287,7 +324,7 @@ function performAction(action) {
   } else if (action === 'classify') {
     if (threat.status === 'unseen') { state.metrics.score -= 5; state.metrics.falseActions += 1; message = `Classify rejected: acquire ${threat.id} first.`; }
     else if (!classification) { message = 'Choose a role in the classification panel first.'; }
-    else { threat.classification = classification; threat.status = 'identified'; state.metrics.classified += 1; const correct = classification === threat.role; if (correct) { state.metrics.correct += 1; state.metrics.score += 18; } else { state.metrics.score -= 9; state.metrics.falseActions += 1; } message = `${threat.id} labelled ${classification.toUpperCase()} · ${correct ? 'match' : 'mismatch'}.`; }
+    else { threat.classification = classification; threat.status = 'identified'; state.metrics.classified += 1; const correct = classification === threat.role; if (correct) { state.metrics.correct += 1; state.metrics.score += 18; } else { state.metrics.score -= 9; state.metrics.falseActions += 1; } const aiCue = threat.aiPrediction ? (classification === threat.aiPrediction ? 'AI cue accepted' : 'AI cue overridden') : 'no AI cue'; if (threat.aiPrediction) classification === threat.aiPrediction ? state.metrics.aiAccepted += 1 : state.metrics.aiOverrides += 1; message = `${threat.id} labelled ${classification.toUpperCase()} · ${correct ? 'match' : 'mismatch'} · ${aiCue}.`; }
   } else if (action === 'alert') {
     if (threat.status === 'identified') { threat.status = 'alerted'; state.metrics.alerts += 1; state.metrics.score += threat.priority === 'high' ? 14 : 7; message = `${threat.id} escalated at ${threat.priority} priority.`; }
     else { state.metrics.score -= 4; state.metrics.falseActions += 1; message = `Escalation gate held: identify ${threat.id} before alerting.`; }
@@ -303,7 +340,8 @@ function renderAAR() {
   const m = state.metrics;
   const accuracy = m.classified ? Math.round(m.correct / m.classified * 100) : 0;
   const avgReaction = m.reaction.length ? (m.reaction.reduce((sum, value) => sum + value, 0) / m.reaction.length).toFixed(1) : '—';
-  $('#aarSummary').innerHTML = `<div class="aar-stat"><span>SCORE</span><b>${Math.max(0, m.score)}</b></div><div class="aar-stat"><span>CLASSIFICATION</span><b>${accuracy}%</b></div><div class="aar-stat"><span>AVG DETECTION</span><b>${avgReaction}s</b></div><div class="aar-stat"><span>RESOLVED</span><b>${m.resolved}/${state.threats.length}</b></div>`;
+  const aiTotal = m.aiAccepted + m.aiOverrides;
+  $('#aarSummary').innerHTML = `<div class="aar-stat"><span>SCORE</span><b>${Math.max(0, m.score)}</b></div><div class="aar-stat"><span>CLASSIFICATION</span><b>${accuracy}%</b></div><div class="aar-stat"><span>AVG DETECTION</span><b>${avgReaction}s</b></div><div class="aar-stat"><span>RESOLVED</span><b>${m.resolved}/${state.threats.length}</b></div><div class="aar-stat"><span>AI CUE USE</span><b>${aiTotal ? `${m.aiAccepted}/${aiTotal}` : '—'}</b></div>`;
   const missed = state.threats.filter((threat) => threat.status === 'unseen' || threat.status === 'detected').map((threat) => threat.id);
   $('#aarAdvice').textContent = missed.length ? `Coach cue: revisit ${missed.join(', ')}. Acquire before classifying, then escalate only after role confidence is explicit.` : 'Coach cue: all tracks reached a safe terminal state. Replay with higher degradation to test whether the decision sequence survives uncertainty.';
   $('#aarPanel').hidden = false;

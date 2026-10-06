@@ -1,1 +1,3 @@
 .setup-actions .finish{grid-column:1/-1;padding:8px 11px;font-size:10px;color:#9ab7bd}
+.ai-cue{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:12px;border:1px solid #245660;border-top:0;background:#0c2028;padding:8px 13px}.ai-cue span{color:#61d6c2;font-size:8px;letter-spacing:.13em;font-weight:800}.ai-cue b{color:#e9f7f3;font-size:10px;white-space:nowrap}.ai-cue small{color:#86aab1;font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:790px){.ai-cue{grid-template-columns:1fr 1fr}.ai-cue small{grid-column:1/-1}}
