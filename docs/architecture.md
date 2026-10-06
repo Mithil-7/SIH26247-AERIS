@@ -19,15 +19,20 @@ AERIS turns a difficult-to-repeat live exercise into a measurable training loop:
    - Injects dropout, delay, noise and confidence loss into the trainee feed.
    - Keeps ground truth available to the instructor and scoring engine.
 
-4. **Operator console**
+4. **Local AI assistance**
+   - A small four-class softmax model converts telemetry features into an explainable role cue: scout, decoy, cargo or unknown.
+   - The cue is advisory. The trainee remains responsible for the final classification, and the AAR records acceptance or override.
+   - The current model is trained on deterministic synthetic, non-operational tracks and can later be replaced by a richer sensor-fusion model.
+
+5. **Operator console**
    - Radar/telemetry view, selected-track details and a small action rail.
    - The interface is intentionally readable in a desktop-only deployment and can become a VR panel later.
 
-5. **Scoring and AAR**
+6. **Scoring and AAR**
    - Measures time to first detection, role classification, prioritisation, escalation and resolution.
    - Preserves an event timeline so instructors can explain *why* a decision was scored.
 
-6. **Replay and analytics contract**
+7. **Replay and analytics contract**
    - A session stores scenario ID/seed, difficulty, degradation, ground truth, actions and score.
    - This contract enables unit-level comparisons without requiring a cloud service.
 

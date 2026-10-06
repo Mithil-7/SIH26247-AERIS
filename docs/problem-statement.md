@@ -31,6 +31,7 @@ A software-based simulation platform is required to train personnel in recognizi
 | --- | --- |
 | Varied realistic scenarios | Urban Relay, Night Corridor and Swarm Breakout packs with seed-controlled motion. |
 | Degraded sensors | Configurable dropout/noise/confidence layer in the trainer console. |
+| AI-enabled training | Local four-class learned role cue with confidence and evidence features. |
 | Decision-tree scoring | Track → classify → alert → resolve sequence with transparent score changes. |
 | AAR dashboard | Event timeline, score, classification accuracy, detection time and coach cue. |
 | Difficulty randomisation | Guided / Standard / Stress levels and seeded replay path. |

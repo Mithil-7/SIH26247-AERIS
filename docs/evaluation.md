@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | Detection | Time from track appearance to first deliberate track action | Baseline run vs coached replay |
 | Classification | Correct role assignment; confusion matrix by scenario | Ground truth labels |
+| AI cue quality | Model top-1 role suggestion and confidence calibration | Ground truth labels; human accept/override rate |
 | Decision quality | Rubric score for sequence, priority and escalation | Instructor-defined policy tree |
 | False alarms | Invalid actions against decoy/civilian tracks | Per-run count and rate |
 | Learning curve | Score and reaction-time change across repeated seeds | Session 1 → Session N |
@@ -26,4 +27,5 @@
 - Every track has a visible ground-truth record for post-run scoring.
 - The same seed produces the same initial scenario state.
 - Every operator action appears in the timeline with a timestamp and result.
+- Selecting a track produces a local model cue with confidence and evidence features.
 - The AAR explains score changes instead of exposing only a single opaque number.
