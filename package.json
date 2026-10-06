@@ -1,0 +1,14 @@
+{
+  "name": "sih26247-aeris",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AERIS — an offline-first drone and counter-drone threat simulation trainer for SIH 2026 PS SIH26247.",
+  "scripts": {
+    "start": "python3 server.py",
+    "build:deck": "node deck/build.js",
+    "test": "node --check web/app.js && node --check deck/build.js && python3 -m py_compile server.py"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}
