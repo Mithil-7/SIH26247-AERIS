@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071018">
+  <title>AERIS · Threat Simulation Trainer</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles-extra.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="AERIS home">
+      <span class="brand-mark">✦</span>
+      <span><strong>AERIS</strong><small>ADAPTIVE THREAT SIMULATION</small></span>
+    </a>
+    <div class="top-meta"><span class="live-dot"></span><span>LOCAL / OFFLINE READY</span><i></i><span>ZERO CODERS</span><a href="https://github.com/Mithil-7/SIH26247-AERIS" target="_blank" rel="noreferrer">GitHub ↗</a></div>
+  </header>
+
+  <main id="top" class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">SIH26247 / TRAINER CONSOLE</p>
+        <h1>Train for the signal<br><em>you will not get.</em></h1>
+        <p class="hero-copy">AERIS turns single-drone and swarm response into repeatable, measurable exercises with degraded feeds, transparent scoring and instant after-action review.</p>
+      </div>
+      <div class="hero-badge"><span>EXERCISE STATUS</span><b id="heroState">READY</b><small id="heroHint">Select a pack to begin</small></div>
+    </section>
+
+    <section class="metric-strip" aria-label="Session metrics">
+      <div><span>SCENARIO</span><b id="metricScenario">—</b><small id="metricTag">Awaiting selection</small></div>
+      <div><span>ELAPSED</span><b id="metricTime">00:00</b><small>exercise clock</small></div>
+      <div><span>TRACKS</span><b id="metricTracks">0</b><small><span id="metricDetected">0</span> detected</small></div>
+      <div class="metric-accent"><span>SCORE</span><b id="metricScore">000</b><small>transparent rubric</small></div>
+    </section>
+
+    <div class="workspace">
+      <aside class="panel setup-panel">
+        <div class="panel-title"><div><span class="eyebrow">01 / SETUP</span><h2>Exercise packs</h2></div><span class="pill">TRAINER</span></div>
+        <div id="scenarioList" class="scenario-list"></div>
+        <div class="control-group">
+          <div class="control-label"><label for="difficulty">Difficulty</label><b id="difficultyValue">Standard</b></div>
+          <input id="difficulty" type="range" min="1" max="3" value="2">
+          <div class="range-notes"><span>GUIDED</span><span>STANDARD</span><span>STRESS</span></div>
+        </div>
+        <div class="control-group">
+          <div class="control-label"><label for="degradation">Sensor degradation</label><b id="degradationValue">0%</b></div>
+          <input id="degradation" type="range" min="0" max="80" value="0">
+          <div class="range-notes"><span>CLEAN</span><span>NOISY</span><span>DEGRADED</span></div>
+        </div>
+        <div class="setup-actions"><button id="startBtn" class="primary">Start exercise <span>↗</span></button><button id="resetBtn" class="secondary">Reset</button><button id="finishBtn" class="secondary finish">End run + open AAR</button></div>
+        <p class="shortcut-note"><kbd>1</kbd> Track <kbd>2</kbd> Classify <kbd>3</kbd> Alert <kbd>4</kbd> Intercept</p>
+      </aside>
+
+      <section class="panel simulator-panel">
+        <div class="panel-title sim-title"><div><span class="eyebrow">02 / LIVE EXERCISE</span><h2 id="exerciseTitle">Choose a pack</h2></div><div class="sim-state"><span id="stateDot" class="state-dot"></span><span id="simState">STANDBY</span></div></div>
+        <div class="arena-wrap">
+          <canvas id="arena" width="900" height="530" aria-label="Synthetic threat radar"></canvas>
+          <div class="arena-corner top-left"><span>AOI / SYNTHETIC</span><b id="arenaArea">—</b></div>
+          <div class="arena-corner top-right"><span>SENSOR QUALITY</span><b id="qualityValue">100%</b></div>
+          <div class="arena-corner bottom-left"><span>GROUND TRUTH</span><b>HIDDEN</b></div>
+          <div class="arena-corner bottom-right"><span>FEED</span><b id="feedValue">LIVE</b></div>
+          <div id="crosshair" class="crosshair" hidden></div>
+        </div>
+        <div class="sim-footer"><div><span>SELECTED TRACK</span><b id="selectedTrack">None</b></div><div><span>CLASSIFICATION</span><select id="classification"><option value="">Choose role…</option><option value="scout">Scout</option><option value="decoy">Decoy</option><option value="cargo">Cargo / civilian</option><option value="unknown">Unknown</option></select></div><div><span>FEED NOTE</span><b id="feedNote">Select a radar track to act</b></div></div>
+        <div class="action-rail"><button class="action" data-action="track"><span>01</span><b>Track</b><small>Acquire signal</small></button><button class="action" data-action="classify"><span>02</span><b>Classify</b><small>Assign role</small></button><button class="action" data-action="alert"><span>03</span><b>Alert</b><small>Escalate</small></button><button class="action danger" data-action="intercept"><span>04</span><b>Intercept</b><small>Resolve safely</small></button></div>
+      </section>
+
+      <aside class="right-stack">
+        <section class="panel feed-panel"><div class="panel-title"><div><span class="eyebrow">03 / TELEMETRY</span><h2>Track picture</h2></div><span class="count" id="trackCount">00</span></div><div id="trackList" class="track-list"><p class="empty">Start an exercise to populate the track picture.</p></div></section>
+        <section class="panel log-panel"><div class="panel-title"><div><span class="eyebrow">04 / EVENT LOG</span><h2>Decision trail</h2></div><span class="pill">LIVE</span></div><div id="eventLog" class="event-log"><p class="empty">Actions and sensor cues will appear here.</p></div></section>
+        <section id="aarPanel" class="panel aar-panel" hidden><div class="panel-title"><div><span class="eyebrow">05 / AFTER-ACTION REVIEW</span><h2>Replay the lesson</h2></div><span class="pill success">COMPLETE</span></div><div id="aarSummary" class="aar-summary"></div><p id="aarAdvice" class="aar-advice"></p><button id="replayBtn" class="secondary full">Replay scenario ↻</button></section>
+      </aside>
+    </div>
+  </main>
+
+  <footer><span>AERIS v0.1 prototype · SIH26247</span><span>Built by <a href="https://github.com/Mithil-7" target="_blank" rel="noreferrer">Mithil-7</a> · Zero Coders</span></footer>
+  <script src="app.js"></script>
+</body>
+</html>
