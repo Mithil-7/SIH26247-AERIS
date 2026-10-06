@@ -25,12 +25,25 @@ The official SIH brief asks for a software simulator that trains personnel to re
 - A browser-based radar/telemetry console that works without external APIs.
 - Selectable synthetic threats with role classification and response actions.
 - Configurable sensor degradation: dropout, noise and delayed-confidence cues.
+- A small locally trained softmax classifier that provides an explainable role cue for a selected track.
 - Transparent scoring for detection time, classification, escalation and response safety.
 - Live event log and end-of-run after-action review (AAR).
 - Keyboard shortcuts for fast training runs: `1` Track, `2` Classify, `3` Alert, `4` Intercept.
 - Instructor-friendly reset and scenario selection for repeatable trials.
 
 The scenario data is synthetic and non-operational. It is intended to demonstrate the training, measurement and replay loop requested in the problem statement.
+
+## AI layer
+
+The prototype includes a real, dependency-free learned component rather than only a planned AI layer. `ai/train_model.py` trains a small four-class softmax classifier on deterministic synthetic track data. The model uses speed, priority, confidence, signature and scenario-context features to suggest `scout`, `decoy`, `cargo` or `unknown`.
+
+The Python server exposes the local model through `/api/ai/predict`. When a trainee selects a track, the console displays the model cue, confidence and evidence features. The trainee still makes the final classification; the AAR records whether the cue was accepted or overridden. Ground truth remains separate for evaluation.
+
+Regenerate the model if required:
+
+```bash
+python3 ai/train_model.py
+```
 
 ## Run locally
 
@@ -69,6 +82,9 @@ git push -u origin main
 ```text
 SIH26247-AERIS/
 ├── data/scenarios.json        # Synthetic scenario and threat definitions
+├── data/threat_role_model.json # Learned model weights for the local AI cue
+├── ai/train_model.py          # Reproducible synthetic training script
+├── ai_model.py                # Dependency-free model loading and inference
 ├── deck/build.js              # SIH proposal deck generator
 ├── docs/architecture.md       # System architecture and scale-up path
 ├── docs/evaluation.md         # Evaluation matrix and measurable outcomes

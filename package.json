@@ -6,7 +6,8 @@
   "scripts": {
     "start": "python3 server.py",
     "build:deck": "node deck/build.js",
-    "test": "node --check web/app.js && node --check deck/build.js && python3 -m py_compile server.py"
+    "train:model": "python3 ai/train_model.py",
+    "test": "node --check web/app.js && node --check deck/build.js && python3 -m py_compile server.py ai_model.py ai/train_model.py"
   },
   "dependencies": {
     "pptxgenjs": "^4.0.1"
